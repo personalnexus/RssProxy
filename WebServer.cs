@@ -56,7 +56,10 @@ namespace RssProxy
                 using (var webClient = new WebClient())
                 {
                     string page = webClient.DownloadString(address);
-                    new StreamWriter(context.Response.OutputStream, webClient.Encoding).Write(page);
+                    using (var writer = new StreamWriter(context.Response.OutputStream, webClient.Encoding))
+                    {
+                        writer.Write(page);
+                    }
                 }
             }
             catch (WebException exception)

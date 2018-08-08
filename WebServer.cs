@@ -10,7 +10,7 @@ namespace RssProxy
     {
         public void Start(WebServerOptions options)
         {
-            LogEvent(EventLogEntryType.Information, "Starting web server at {0}", options.UrlPrefix);
+            LogEvent(EventLogEntryType.Information, $"Starting web server at {options.UrlPrefix}");
 
             _httpListener = new HttpListener();
             _httpListener.Prefixes.Add(options.UrlPrefix);
@@ -39,7 +39,7 @@ namespace RssProxy
                         // Ignore exceptions if _httpListener has been stopped
                         if (httpListener.IsListening)
                         {
-                           LogEvent(EventLogEntryType.Error, "An unexpected error occurred while processing requests: {0}\r\n{1}", exception.Message, exception.StackTrace);
+                           LogEvent(EventLogEntryType.Error, $"An unexpected error occurred while processing requests: {exception.Message}\r\n{exception.StackTrace}");
                         }
                         continue;
                     }
@@ -50,7 +50,7 @@ namespace RssProxy
         private void ProcessRequest(HttpListenerContext context)
         {
             string address = "https:/" + context.Request.Url.AbsolutePath;
-            LogEvent(EventLogEntryType.Information, "Downloading {0}...", address);
+            LogEvent(EventLogEntryType.Information, "Downloading {address}...");
             try
             {
                 using (var webClient = new WebClient())
@@ -66,7 +66,7 @@ namespace RssProxy
             {
                 HttpStatusCode? status = (exception.Response as HttpWebResponse)?.StatusCode;
                 context.Response.StatusCode = status.HasValue ? (int)status.Value : 500;
-                throw new Exception(string.Format("Error {0} occurred while processing a request for {1}: {2}\r\n{3}", context.Response.StatusCode, context.Request.RawUrl), exception);
+                throw new Exception($"Error {context.Response.StatusCode} occurred while processing a request for {context.Request.RawUrl}", exception);
             }
             catch (Exception)
             {
@@ -79,7 +79,7 @@ namespace RssProxy
             }
         }
 
-        private void LogEvent(EventLogEntryType entryType, string messageFormat, params object[] messageParameters)
+        private void LogEvent(EventLogEntryType entryType, string message)
         {
             //TODO: add event logging
         }

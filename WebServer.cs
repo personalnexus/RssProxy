@@ -49,8 +49,8 @@ namespace RssProxy
 
         private void ProcessRequest(HttpListenerContext context)
         {
-            string address = "https:/" + context.Request.Url.AbsolutePath;
-            LogEvent(EventLogEntryType.Information, "Downloading {address}...");
+            string address = "https:/" + context.Request.Url.PathAndQuery;
+            LogEvent(EventLogEntryType.Information, $"Downloading {address}...");
             try
             {
                 using (var webClient = new WebClient())
@@ -68,9 +68,10 @@ namespace RssProxy
                 context.Response.StatusCode = status.HasValue ? (int)status.Value : 500;
                 throw new Exception($"Error {context.Response.StatusCode} occurred while processing a request for {context.Request.RawUrl}", exception);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
                 context.Response.StatusCode = 500;
+                LogEvent(EventLogEntryType.Error, exception.Message);
                 throw;
             }
             finally

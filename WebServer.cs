@@ -49,7 +49,7 @@ namespace RssProxy
 
         private void ProcessRequest(HttpListenerContext context)
         {
-            string address = "https:/" + context.Request.Url.PathAndQuery;
+            string address = ConvertRequestUrl(context.Request.Url);
             LogEvent(EventLogEntryType.Information, $"Downloading {address}...");
             try
             {
@@ -78,6 +78,11 @@ namespace RssProxy
             {
                 context.Response.Close();
             }
+        }
+
+        internal static string ConvertRequestUrl(Uri requestUrl)
+        {
+            return "https:/" + requestUrl.PathAndQuery;
         }
 
         private void LogEvent(EventLogEntryType entryType, string message)
